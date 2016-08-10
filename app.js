@@ -7,9 +7,44 @@ const fs = require('fs');
 const app = express();
 
 app.get('*', (req, res) => {
-    res
-      .status(200)
-      .json({message: 'ok'})
+    res.writeHead(200, { 'Content-Length': 42 });
+    res.end('<h1>Hi</h1><script src="main.js"></script><script src="main2.js"></script><script src="main3.js"></script><script src="main4.js"></script>');
+
+
+      if (res.push){
+
+        var stream = res.push(['/main.js', '/main2.js'], {
+                req: {'accept': '**/*'},
+                res: {'content-type': 'application/javascript'}
+            });
+
+
+                var stream3 = res.push('/main3.js', {
+                        req: {'accept': '**/*'},
+                        res: {'content-type': 'application/javascript'}
+                    });
+                    var stream4 = res.push('/main4.js', {
+                            req: {'accept': '**/*'},
+                            res: {'content-type': 'application/javascript'}
+                        });
+
+        stream.on('error', function() {
+           console.error(err);
+         });
+
+         stream.end();
+
+          stream3.on('error', function() {
+             console.error(err);
+           });
+
+           stream3.end();
+           stream4.on('error', function() {
+              console.error(err);
+            });
+
+            stream4.end();
+      }
 });
 
 
