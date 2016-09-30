@@ -2,48 +2,30 @@ const port = 3000;
 const spdy = require('spdy');
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
+const fs = require('mz/fs')
 
 const app = express();
 
 app.get('*', (req, res) => {
-    res.writeHead(200, { 'Content-Length': 42 });
-    res.end('<h1>Hi</h1><script src="main.js"></script><script src="main2.js"></script><script src="main3.js"></script><script src="main4.js"></script>');
 
+    // Read in the file
+    fs.readFile('home.html','utf8')
+      .then(file => {
+        res.writeHead(200, { 'Content-Length': 42 });
+        res.end(file);
+      });
 
+      // Does the browser support push?
       if (res.push){
+          res.push('/js/randomNumber.js', {
+              req: {'accept': '**/*'},
+              res: {'content-type': 'application/javascript'}
+          }).end();
 
-        var stream = res.push(['/main.js', '/main2.js'], {
-                req: {'accept': '**/*'},
-                res: {'content-type': 'application/javascript'}
-            });
-
-
-                var stream3 = res.push('/main3.js', {
-                        req: {'accept': '**/*'},
-                        res: {'content-type': 'application/javascript'}
-                    });
-                    var stream4 = res.push('/main4.js', {
-                            req: {'accept': '**/*'},
-                            res: {'content-type': 'application/javascript'}
-                        });
-
-        stream.on('error', function() {
-           console.error(err);
-         });
-
-         stream.end();
-
-          stream3.on('error', function() {
-             console.error(err);
-           });
-
-           stream3.end();
-           stream4.on('error', function() {
-              console.error(err);
-            });
-
-            stream4.end();
+          res.push('/js/squareRoot.js', {
+              req: {'accept': '**/*'},
+              res: {'content-type': 'application/javascript'}
+          }).end();
       }
 });
 
