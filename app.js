@@ -1,37 +1,51 @@
-const port = 3000;
 const spdy = require('spdy');
 const express = require('express');
-const path = require('path');
-const fs = require('mz/fs')
+const fs = require('mz/fs');
 
 const app = express();
 
-app.get('*', (req, res) => {
+app.use(express.static('public'));
 
-    // Read in the file
-    fs.readFile('home.html','utf8')
-      .then(file => {
-        res.writeHead(200, { 'Content-Length': 42 });
-        res.end(file);
-      });
+app.get('/home', (req, res) => {
+    Promise.all([
+      fs.readFile('home.html'),
+      fs.readFile('public/js/squareRoot.js'),
+      fs.readFile('public/images/image.jpg'),
+    ]).then(files => {
 
       // Does the browser support push?
       if (res.push){
-          res.push('/js/randomNumber.js', {
+          // The JS file
+          var squareRootStream = res.push('/js/squareRoot.js', {
               req: {'accept': '**/*'},
               res: {'content-type': 'application/javascript'}
-          }).end();
+          });
 
-          res.push('/js/squareRoot.js', {
+          squareRootStream.on('error', err => {
+            console.log(err);
+          });
+
+          squareRootStream.end(files[1]);
+
+          // The Image
+          var imageStream = res.push('/images/image.jpg', {
               req: {'accept': '**/*'},
-              res: {'content-type': 'application/javascript'}
-          }).end();
+              res: {'content-type': 'image/jpeg'}
+          });
+
+          imageStream.on('error', err => {
+            console.log(err);
+          });
+
+          imageStream.end(files[2]);
       }
+
+      res.writeHead(200, { 'Content-Length': 42 });
+      res.end(files[0]);
+    }).catch(error => res.status(500).send(error.toString()));
 });
 
-
-spdy
-    .createServer({
+spdy.createServer({
         key: fs.readFileSync('./server.key'),
         cert: fs.readFileSync('./server.crt')
     }, app)

@@ -7,7 +7,9 @@
     "express": "^4.14.0",
     "http2": "^3.3.4",
     "mz": "^2.4.0",
-    "spdy": "^3.3.4"
+    "nodemon": "^1.10.2",
+    "spdy": "^3.3.4",
+    "spdy-push": "^1.0.2"
   },
   "devDependencies": {},
   "scripts": {
