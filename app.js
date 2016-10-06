@@ -40,7 +40,7 @@ app.get('/home', (req, res) => {
           imageStream.end(files[2]);
       }
 
-      res.writeHead(200, { 'Content-Length': 42 });
+      res.writeHead(200);
       res.end(files[0]);
     }).catch(error => res.status(500).send(error.toString()));
 });
