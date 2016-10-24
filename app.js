@@ -10,7 +10,7 @@ app.get('/home', (req, res) => {
     Promise.all([
       fs.readFile('home.html'),
       fs.readFile('public/js/squareRoot.js'),
-      fs.readFile('public/images/image.jpg'),
+      fs.readFile('public/js/randomNumber.js'),
     ]).then(files => {
 
       // Does the browser support push?
@@ -28,16 +28,16 @@ app.get('/home', (req, res) => {
           squareRootStream.end(files[1]);
 
           // The Image
-          var imageStream = res.push('/images/image.jpg', {
+          var randomNumberStream = res.push('/js/randomNumber.js', {
               req: {'accept': '**/*'},
-              res: {'content-type': 'image/jpeg'}
+              res: {'content-type': 'application/javascript'}
           });
 
-          imageStream.on('error', err => {
+          randomNumberStream.on('error', err => {
             console.log(err);
           });
 
-          imageStream.end(files[2]);
+          randomNumberStream.end(files[2]);
       }
 
       res.writeHead(200);
